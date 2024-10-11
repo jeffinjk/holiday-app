@@ -1,18 +1,40 @@
 "use client"; // Mark this component as a Client Component
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { FaLightbulb } from 'react-icons/fa'; // Importing the bulb icon
+import { Ripple, initTWE } from 'tw-elements'; // Import Ripple from tw-elements
+
+// Initialize tw-elements
+initTWE({ Ripple });
 
 const HolidaysPage = () => {
   const [country, setCountry] = useState('');
   const [year, setYear] = useState('');
   const [holidays, setHolidays] = useState([]);
   const [error, setError] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode
+  const [buttonShape, setButtonShape] = useState('rectangle'); // State for button shape
+
+  useEffect(() => {
+    // Load the theme from localStorage on initial render
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme) {
+      setIsDarkMode(storedTheme === 'dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    setIsDarkMode((prev) => !prev);
+    // Store the selected theme in localStorage
+    localStorage.setItem('theme', !isDarkMode ? 'dark' : 'light');
+  };
 
   const fetchHolidays = async () => {
+    setButtonShape('circle'); // Change button shape to circle
     try {
       const response = await fetch(`http://localhost:5000/api/holidays?country=${country}&year=${year}`);
       const data = await response.json();
-  
+
       if (response.ok) {
         setHolidays(data.holidays);
         setError('');
@@ -23,43 +45,70 @@ const HolidaysPage = () => {
     } catch (err) {
       setError('Error fetching data');
       setHolidays([]);
+    } finally {
+      setTimeout(() => setButtonShape('rectangle'), 300); // Change back to rectangle after 300ms
     }
   };
-  
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Holidays Finder</h1>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Country Code (e.g., IN)"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          className="border p-2 mr-2"
+    <div className={`min-h-screen flex flex-col justify-between p-4 relative transition-all duration-500 ${isDarkMode ? 'bg-navy-blue text-white' : 'bg-white text-black'}`}>
+      {/* Theme Toggle Icon */}
+      <div
+        className={`absolute top-4 right-4 cursor-pointer transition-transform duration-500 transform ${isDarkMode ? 'animate-jump' : ''}`}
+        onClick={toggleTheme}
+      >
+        <FaLightbulb
+          className={`text-3xl transition-transform duration-500 ${isDarkMode ? 'text-yellow-300 animate-glow' : 'text-gray-600'}`}
         />
-        <input
-          type="number"
-          placeholder="Year (e.g., 2023)"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          className="border p-2 mr-2"
-        />
-        <button
-          onClick={fetchHolidays}
-          className="bg-blue-500 text-white p-2"
-        >
-          Get Holidays
-        </button>
       </div>
-      {error && <p className="text-red-500">{error}</p>}
-      <ul>
-        {holidays.map((holiday, index) => (
-          <li key={index}>
-            <strong>{holiday.name}</strong> - {holiday.date} ({holiday.type})
-          </li>
-        ))}
-      </ul>
+
+      <div className="flex-grow flex flex-col items-center justify-center">
+        <h1 className={`text-3xl font-bold mb-6 transition-opacity duration-500`}>Holidays Finder</h1>
+        
+        {/* Vertically arranged input fields */}
+        <div className="mb-4 flex flex-col items-center w-full max-w-md">
+          <input
+            type="text"
+            placeholder="Country Code (e.g., IN)"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className={`border p-3 mb-3 w-full rounded-md shadow-md transition-shadow duration-300 ${isDarkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-400 bg-white'}`}
+          />
+          <input
+            type="number"
+            placeholder="Year (e.g., 2023)"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            className={`border p-3 mb-3 w-full rounded-md shadow-md transition-shadow duration-300 ${isDarkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-400 bg-white'}`}
+          />
+          <button
+            type="button"
+            data-twe-ripple-init
+            data-twe-ripple-color="light"
+            onClick={fetchHolidays}
+            className={`inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong ${buttonShape === 'circle' ? 'rounded-full' : 'rounded-md'}`}
+          >
+            Get Holidays
+          </button>
+        </div>
+        
+        {error && <p className={`text-red-500 ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>{error}</p>}
+        
+        {/* Scrollable holidays list with customized scrollbar */}
+        <div className={`border-neon-dark-blue overflow-y-scroll h-60 p-4 rounded-lg my-4 transition-all duration-500 scrollbar-custom ${isDarkMode ? 'bg-navy-blue-light' : 'bg-white'}`}>
+          <ul>
+            {holidays.map((holiday, index) => (
+              <li key={index} className={`p-2 rounded-md transition-colors duration-300 ${isDarkMode ? 'text-white hover:bg-gray-700' : 'text-black hover:bg-gray-100'}`}>
+                <strong>{holiday.name}</strong> - {holiday.date} ({holiday.type})
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      
+      <footer className="text-center mt-4">
+        <p className={`${isDarkMode ? 'text-white' : 'text-black'}`}>© 2024 All Rights Reserved</p>
+      </footer>
     </div>
   );
 };

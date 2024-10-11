@@ -2,4 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
+/* General Styles */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for colors */
+}
 
+.bg-navy-blue {
+  background-color: #001f3f; /* Navy blue background */
+}
+
+.border-neon-dark-blue {
+  border: 2px solid #001f3f; /* Dark blue border */
+  transition: border-color 0.5s ease; /* Animation for border color */
+}
+
+/* Animation for Fade Transition */
+.fade-in {
+  opacity: 0;
+  animation: fadeIn 1s forwards; /* Fade-in animation */
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Jump Animation */
+@keyframes jump {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-jump {
+  animation: jump 0.5s; /* Jump animation */
+}
+
+/* Glow Animation */
+@keyframes glow {
+  from {
+    text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00, 0 0 15px #ffcc00, 0 0 20px #ffcc00;
+  }
+  to {
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00, 0 0 40px #ffcc00;
+  }
+}
+
+/* Text Colors for Dark Mode */
+.text-white {
+  color: white;
+}
+
+.text-black {
+  color: black;
+}
