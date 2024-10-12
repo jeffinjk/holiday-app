@@ -7,6 +7,12 @@ import { Ripple, initTWE } from 'tw-elements'; // Import Ripple from tw-elements
 // Initialize tw-elements
 initTWE({ Ripple });
 
+// Define an interface for the country object
+interface Country {
+  code: string;
+  name: string;
+}
+
 const HolidaysPage = () => {
   const [country, setCountry] = useState('');
   const [year, setYear] = useState('');
@@ -14,18 +20,18 @@ const HolidaysPage = () => {
   const [error, setError] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode
   const [buttonShape, setButtonShape] = useState('rectangle'); // State for button shape
-  const [countries, setCountries] = useState([]); // State for storing country list
+  const [countries, setCountries] = useState<Country[]>([]); // State for storing country list
 
   useEffect(() => {
     // Fetch the list of countries for the dropdown
     const fetchCountries = async () => {
       try {
-        const response = await fetch('https://holidayapi.com/v1/countries?pretty&key=6e4f2458-229e-4e30-b102-f3a2be229ea0');
+        const response = await fetch('https://holidayapi.com/v1/countries?pretty&key=YOUR_API_KEY');
         const data = await response.json();
-
+    
         if (response.ok) {
           // Map countries to desired format
-          const countryList = data.countries.map(country => ({
+          const countryList = data.countries.map((country: Country) => ({
             code: country.code,
             name: country.name,
           }));
@@ -33,11 +39,11 @@ const HolidaysPage = () => {
         } else {
           console.error('Failed to fetch countries', data.error);
         }
-      } catch (error) {
+      } catch (error) {  // Changed `err` to `error`
         console.error('Error fetching countries:', error);
       }
     };
-
+    
     fetchCountries();
 
     // Load the theme from localStorage on initial render
@@ -67,7 +73,7 @@ const HolidaysPage = () => {
         setError(data.error || 'Failed to fetch holidays');
         setHolidays([]);
       }
-    } catch (err) {
+    } catch  { // Indicate unused variable
       setError('Error fetching data');
       setHolidays([]);
     } finally {
@@ -118,11 +124,11 @@ const HolidaysPage = () => {
             data-twe-ripple-init
             data-twe-ripple-color={isDarkMode ? 'light' : 'dark'}
             onClick={fetchHolidays}
-            className={`inline-block rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:shadow-primary-2 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:shadow-primary-2 motion-reduce:transition-none ${
+            className={`inline-block rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:shadow-primary-2 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:shadow-primary-2 motion-reduce:transition-none $(
               isDarkMode
                 ? 'bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-800'
                 : 'bg-[#001f3f] hover:bg-[#001f5f] focus:bg-[#001f5f] active:bg-[#001f6f]'
-            } ${buttonShape === 'circle' ? 'rounded-full' : 'rounded-md'}`}
+            ) ${buttonShape === 'circle' ? 'rounded-full' : 'rounded-md'}`}
           >
             Get Holidays
           </button>
