@@ -13,10 +13,17 @@ interface Country {
   name: string;
 }
 
+// Define an interface for the holiday object
+interface Holiday {
+  name: string;
+  date: string;
+  type: string;
+}
+
 const HolidaysPage = () => {
   const [country, setCountry] = useState('');
   const [year, setYear] = useState('');
-  const [holidays, setHolidays] = useState([]);
+  const [holidays, setHolidays] = useState<Holiday[]>([]); // State for storing holidays with type
   const [error, setError] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode
   const [buttonShape, setButtonShape] = useState('rectangle'); // State for button shape
@@ -67,7 +74,7 @@ const HolidaysPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setHolidays(data.holidays);
+        setHolidays(data.holidays); // Assuming data.holidays is an array of Holiday objects
         setError('');
       } else {
         setError(data.error || 'Failed to fetch holidays');
