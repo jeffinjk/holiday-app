@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Mark this component as a Client Component
 
 import { useState, useEffect } from 'react';
 import { FaLightbulb } from 'react-icons/fa'; // Importing the bulb icon
@@ -14,16 +14,36 @@ const HolidaysPage = () => {
   const [error, setError] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false); // State for dark mode
   const [buttonShape, setButtonShape] = useState('rectangle'); // State for button shape
+  const [countries, setCountries] = useState([]); // State for storing country list
 
   useEffect(() => {
-    // Load the theme from localStorage or detect the device's default theme
+    // Fetch the list of countries for the dropdown
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch('https://holidayapi.com/v1/countries?pretty&key=6e4f2458-229e-4e30-b102-f3a2be229ea0');
+        const data = await response.json();
+
+        if (response.ok) {
+          // Map countries to desired format
+          const countryList = data.countries.map(country => ({
+            code: country.code,
+            name: country.name,
+          }));
+          setCountries(countryList);
+        } else {
+          console.error('Failed to fetch countries', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching countries:', error);
+      }
+    };
+
+    fetchCountries();
+
+    // Load the theme from localStorage on initial render
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       setIsDarkMode(storedTheme === 'dark');
-    } else {
-      // Check the device's preferred color scheme
-      const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(prefersDarkMode);
     }
   }, []);
 
@@ -36,7 +56,8 @@ const HolidaysPage = () => {
   const fetchHolidays = async () => {
     setButtonShape('circle'); // Change button shape to circle
     try {
-      const response = await fetch(`http://localhost:5000/api/holidays?country=${country}&year=${year}`);
+      // Only send the selected country code and year to the API
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/holidays?country=${country}&year=${year}`);
       const data = await response.json();
 
       if (response.ok) {
@@ -71,13 +92,20 @@ const HolidaysPage = () => {
         
         {/* Vertically arranged input fields */}
         <div className="mb-4 flex flex-col items-center w-full max-w-md">
-          <input
-            type="text"
-            placeholder="Country Code (e.g., IN)"
+          {/* Country Dropdown */}
+          <select
             value={country}
             onChange={(e) => setCountry(e.target.value)}
             className={`border p-3 mb-3 w-full rounded-md shadow-md transition-shadow duration-300 ${isDarkMode ? 'border-gray-600 bg-gray-800' : 'border-gray-400 bg-white'}`}
-          />
+          >
+            <option value="">Select Country</option>
+            {countries.map((country) => (
+              <option key={country.code} value={country.code}>
+                {`${country.code}-${country.name}`} {/* Display in code-country format */}
+              </option>
+            ))}
+          </select>
+
           <input
             type="number"
             placeholder="Year (e.g., 2023)"
@@ -99,10 +127,10 @@ const HolidaysPage = () => {
             Get Holidays
           </button>
         </div>
-
+        
         {error && <p className={`text-red-500 ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>{error}</p>}
-
-        {/* Conditionally render the holidays list with the custom scrollbar */}
+        
+        {/* Conditionally render the holidays list */}
         {holidays.length > 0 && (
           <div className={`border-neon-dark-blue overflow-y-scroll h-60 p-4 rounded-lg my-4 transition-all duration-500 scrollbar-custom ${isDarkMode ? 'bg-navy-blue-light' : 'bg-white'}`}>
             <ul>
@@ -115,7 +143,7 @@ const HolidaysPage = () => {
           </div>
         )}
       </div>
-
+      
       <footer className="text-center mt-4">
         <p className={`${isDarkMode ? 'text-white' : 'text-black'}`}>© 2024 All Rights Reserved</p>
       </footer>
