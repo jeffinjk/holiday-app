@@ -60,3 +60,45 @@ body {
 .text-black {
   color: black;
 }
+
+.scrollbar-custom {
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #001f3f transparent; /* For Firefox */
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 10px;
+  background-color: transparent;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #001f3f;
+  border-radius: 5px;
+  position: relative;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ffcc00;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+}
+
+/* Dark mode adjustments for scrollbar */
+.dark .scrollbar-custom::-webkit-scrollbar-thumb {
+  background-color: #ffffff; /* White scrollbar thumb in dark mode */
+}
+
+/* Additional Styles for Dark Mode */
+.bg-navy-blue {
+  background-color: #001f3f; /* Navy blue background */
+}
+
+.border-neon-dark-blue {
+  border: 2px solid #001f3f; /* Dark blue border */
+}

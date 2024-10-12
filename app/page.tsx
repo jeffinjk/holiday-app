@@ -1,4 +1,4 @@
-"use client"; // Mark this component as a Client Component
+"use client";
 
 import { useState, useEffect } from 'react';
 import { FaLightbulb } from 'react-icons/fa'; // Importing the bulb icon
@@ -16,10 +16,14 @@ const HolidaysPage = () => {
   const [buttonShape, setButtonShape] = useState('rectangle'); // State for button shape
 
   useEffect(() => {
-    // Load the theme from localStorage on initial render
+    // Load the theme from localStorage or detect the device's default theme
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme) {
       setIsDarkMode(storedTheme === 'dark');
+    } else {
+      // Check the device's preferred color scheme
+      const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(prefersDarkMode);
     }
   }, []);
 
@@ -84,28 +88,34 @@ const HolidaysPage = () => {
           <button
             type="button"
             data-twe-ripple-init
-            data-twe-ripple-color="light"
+            data-twe-ripple-color={isDarkMode ? 'light' : 'dark'}
             onClick={fetchHolidays}
-            className={`inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong ${buttonShape === 'circle' ? 'rounded-full' : 'rounded-md'}`}
+            className={`inline-block rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:shadow-primary-2 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:shadow-primary-2 motion-reduce:transition-none ${
+              isDarkMode
+                ? 'bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-800'
+                : 'bg-[#001f3f] hover:bg-[#001f5f] focus:bg-[#001f5f] active:bg-[#001f6f]'
+            } ${buttonShape === 'circle' ? 'rounded-full' : 'rounded-md'}`}
           >
             Get Holidays
           </button>
         </div>
-        
+
         {error && <p className={`text-red-500 ${isDarkMode ? 'text-red-300' : 'text-red-600'}`}>{error}</p>}
-        
-        {/* Scrollable holidays list with customized scrollbar */}
-        <div className={`border-neon-dark-blue overflow-y-scroll h-60 p-4 rounded-lg my-4 transition-all duration-500 scrollbar-custom ${isDarkMode ? 'bg-navy-blue-light' : 'bg-white'}`}>
-          <ul>
-            {holidays.map((holiday, index) => (
-              <li key={index} className={`p-2 rounded-md transition-colors duration-300 ${isDarkMode ? 'text-white hover:bg-gray-700' : 'text-black hover:bg-gray-100'}`}>
-                <strong>{holiday.name}</strong> - {holiday.date} ({holiday.type})
-              </li>
-            ))}
-          </ul>
-        </div>
+
+        {/* Conditionally render the holidays list with the custom scrollbar */}
+        {holidays.length > 0 && (
+          <div className={`border-neon-dark-blue overflow-y-scroll h-60 p-4 rounded-lg my-4 transition-all duration-500 scrollbar-custom ${isDarkMode ? 'bg-navy-blue-light' : 'bg-white'}`}>
+            <ul>
+              {holidays.map((holiday, index) => (
+                <li key={index} className={`p-2 rounded-md transition-colors duration-300 ${isDarkMode ? 'text-white hover:bg-gray-700' : 'text-black hover:bg-gray-100'}`}>
+                  <strong>{holiday.name}</strong> - {holiday.date} ({holiday.type})
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
-      
+
       <footer className="text-center mt-4">
         <p className={`${isDarkMode ? 'text-white' : 'text-black'}`}>© 2024 All Rights Reserved</p>
       </footer>
