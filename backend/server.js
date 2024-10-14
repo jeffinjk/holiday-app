@@ -5,6 +5,7 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Middleware
 app.use(cors());
 
 // Endpoint to get holiday data
@@ -16,8 +17,12 @@ app.get('/api/holidays', async (req, res) => {
         return res.status(400).json({ error: 'Country and year are required' });
     }
 
-    // Replace with your actual API key
-    const apiKey = '6e4f2458-229e-4e30-b102-f3a2be229ea0';
+    // Use the API key from environment variables
+    const apiKey = process.env.API_KEY;
+    if (!apiKey) {
+        return res.status(500).json({ error: 'API key is not configured' });
+    }
+
     const apiUrl = `https://holidayapi.com/v1/holidays?key=${apiKey}&country=${country}&year=${year}`;
 
     try {
