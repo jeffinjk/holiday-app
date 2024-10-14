@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FaLightbulb } from 'react-icons/fa'; 
+import "./globals.css";
 
 interface Country {
   code: string;
@@ -64,7 +65,7 @@ const HolidaysPage = () => {
   const fetchHolidays = async () => {
     setButtonShape('circle');
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/holidays?country=${country}&year=${year}`);
+      const response = await fetch(`http://localhost:5000/api/holidays?country=${country}&year=${year}`);
       const data = await response.json();
 
       if (response.ok) {
